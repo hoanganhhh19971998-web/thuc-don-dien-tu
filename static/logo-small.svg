@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <defs>
+    <linearGradient id="sGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4a6a9c"/>
+      <stop offset="50%" stop-color="#2d4a7a"/>
+      <stop offset="100%" stop-color="#1a2a4a"/>
+    </linearGradient>
+    <linearGradient id="fGrad" x1="0.5" y1="1" x2="0.5" y2="0">
+      <stop offset="0%" stop-color="#2d4a7a"/>
+      <stop offset="100%" stop-color="#4a7ab8"/>
+    </linearGradient>
+  </defs>
+  
+  <g transform="translate(100, 105)">
+    <!-- Star -->
+    <polygon points="0,-75 18,-24 70,-24 29,10 43,60 0,29 -43,60 -29,10 -70,-24 -18,-24" 
+      fill="none" stroke="url(#sGrad)" stroke-width="12" stroke-linejoin="round"/>
+    
+    <!-- Flame -->
+    <path d="M 18,-24 C 30,-48 48,-36 44,-60 C 56,-42 64,-54 58,-76 
+             C 70,-54 82,-36 70,-18 C 58,0 46,-6 44,12 
+             C 40,0 35,-12 29,-6 C 23,6 18,-12 18,-24 Z" 
+      fill="url(#fGrad)" opacity="0.95"/>
+    
+    <!-- Second flame wave -->
+    <path d="M 32,-18 C 41,-36 50,-24 53,-48 
+             C 61,-30 67,-39 64,-58 
+             C 73,-42 79,-27 70,-12 
+             C 61,3 53,-3 50,9 
+             C 47,0 42,-9 38,-5 C 34,3 29,-9 32,-18 Z" 
+      fill="url(#fGrad)" opacity="0.7"/>
+  </g>
+</svg>

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Hệ thống thực đơn điện tử quân đội - Quản lý nhà ăn, dinh dưỡng, đánh giá và thi đua">
+    <title>HOÀNG ANH | Thực Đơn Điện Tử</title>
+    <link rel="icon" type="image/png" href="/static/logo.png">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        .auth-page-main * { font-family: 'Inter', sans-serif; }
+        .auth-page-main {
+            min-height: 100vh; display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, #0a0e27 0%, #0d1b3e 25%, #0f2044 50%, #0a1628 100%);
+            position: relative; overflow: hidden;
+        }
+        .auth-page-main::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(ellipse at 30% 20%, rgba(59,130,246,0.08) 0%, transparent 50%),
+                        radial-gradient(ellipse at 70% 80%, rgba(147,51,234,0.06) 0%, transparent 50%),
+                        radial-gradient(ellipse at 50% 50%, rgba(16,185,129,0.04) 0%, transparent 50%);
+            animation: bgFloatM 20s ease-in-out infinite;
+        }
+        @keyframes bgFloatM { 0%,100%{transform:translate(0,0)rotate(0)} 33%{transform:translate(30px,-20px)rotate(1deg)} 66%{transform:translate(-20px,15px)rotate(-1deg)} }
+        .auth-page-main .mparticle {
+            position: absolute; border-radius: 50%; pointer-events: none; opacity: 0.15;
+            animation: mpFloat linear infinite;
+        }
+        @keyframes mpFloat { 0%{transform:translateY(100vh) rotate(0)} 100%{transform:translateY(-100vh) rotate(720deg)} }
+        .auth-card-m {
+            position: relative; z-index: 10; width: 100%; max-width: 480px; padding: 20px;
+        }
+        .auth-box-m {
+            background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid rgba(255,255,255,0.08); border-radius: 24px;
+            padding: 48px 40px; box-shadow: 0 32px 64px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05) inset;
+            animation: cardSlideM 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes cardSlideM { from{opacity:0;transform:translateY(30px)scale(0.95)} to{opacity:1;transform:translateY(0)scale(1)} }
+        .mlogo { text-align: center; margin-bottom: 32px; }
+        .mlogo img {
+            width: 80px; height: 80px; border-radius: 20px; object-fit: cover;
+            box-shadow: 0 8px 32px rgba(59,130,246,0.25); border: 2px solid rgba(59,130,246,0.3);
+            animation: mlogoPulse 3s ease-in-out infinite;
+        }
+        @keyframes mlogoPulse { 0%,100%{box-shadow:0 8px 32px rgba(59,130,246,0.25)} 50%{box-shadow:0 8px 48px rgba(59,130,246,0.4)} }
+        .mbrand { font-size: 1.6rem; font-weight: 800; letter-spacing: 2px; margin-top: 16px;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa, #34d399);
+            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; background-size: 200% 200%;
+            animation: mgShift 4s ease infinite;
+        }
+        @keyframes mgShift { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
+        .msub { color: rgba(148,163,184,0.8); font-size: 0.85rem; margin-top: 6px; font-weight: 400; }
+        .mtabs { display: flex; gap: 4px; background: rgba(255,255,255,0.04); border-radius: 14px; padding: 4px; margin-bottom: 28px; }
+        .mtab {
+            flex: 1; padding: 12px 0; text-align: center; border-radius: 12px; font-size: 0.85rem;
+            font-weight: 600; color: rgba(148,163,184,0.7); cursor: pointer; transition: all 0.3s;
+            border: none; background: none; letter-spacing: 0.5px;
+        }
+        .mtab:hover { color: rgba(148,163,184,1); }
+        .mtab.active {
+            background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(147,51,234,0.15));
+            color: #f1f5f9; box-shadow: 0 2px 12px rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.2);
+        }
+        .mform { display: flex; flex-direction: column; gap: 16px; }
+        .mfield label {
+            display: block; font-size: 0.75rem; font-weight: 600; color: rgba(148,163,184,0.9);
+            margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1.5px;
+        }
+        .minput-wrap {
+            position: relative; display: flex; align-items: center;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px; transition: all 0.3s; overflow: hidden;
+        }
+        .minput-wrap:focus-within { border-color: rgba(59,130,246,0.5); box-shadow: 0 0 0 3px rgba(59,130,246,0.1); background: rgba(255,255,255,0.06); }
+        .minput-icon { padding: 0 0 0 16px; font-size: 1.1rem; color: rgba(148,163,184,0.5); flex-shrink: 0; transition: color 0.3s; }
+        .minput-wrap:focus-within .minput-icon { color: #60a5fa; }
+        .minput {
+            flex: 1; padding: 14px 16px; font-size: 0.9rem; color: #f1f5f9;
+            background: transparent; border: none; outline: none; font-family: 'Inter', sans-serif;
+        }
+        .minput::placeholder { color: rgba(148,163,184,0.4); }
+        .minput:-webkit-autofill { -webkit-text-fill-color: #f1f5f9; transition: background-color 5000s ease-in-out 0s; }
+        .mpw-toggle { padding: 0 14px; cursor: pointer; font-size: 1.1rem; color: rgba(148,163,184,0.4); transition: color 0.2s; background: none; border: none; flex-shrink: 0; }
+        .mpw-toggle:hover { color: #60a5fa; }
+        .mpw-str { margin-top: 8px; }
+        .mpw-bar { height: 4px; border-radius: 4px; background: rgba(255,255,255,0.06); overflow: hidden; margin-bottom: 4px; }
+        .mpw-fill { height: 100%; border-radius: 4px; transition: all 0.4s; width: 0; }
+        .mpw-txt { font-size: 0.7rem; font-weight: 500; }
+        .mpw-1 { width:25%;background:#ef4444 } .mpw-2 { width:50%;background:#f59e0b } .mpw-3 { width:75%;background:#3b82f6 } .mpw-4 { width:100%;background:#10b981 }
+        .mbtn {
+            width: 100%; padding: 16px; border: none; border-radius: 14px; font-size: 0.95rem;
+            font-weight: 700; letter-spacing: 0.5px; cursor: pointer; position: relative; overflow: hidden;
+            color: white; margin-top: 4px;
+            background: linear-gradient(135deg, #3b82f6, #6366f1, #8b5cf6);
+            box-shadow: 0 4px 16px rgba(59,130,246,0.3); transition: all 0.3s;
+        }
+        .mbtn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(59,130,246,0.4); }
+        .mbtn:active { transform: translateY(0); }
+        .mbtn::after { content:''; position:absolute; top:-50%; left:-50%; width:200%; height:200%;
+            background: linear-gradient(transparent, rgba(255,255,255,0.08), transparent); transform: rotate(45deg); transition: 0.5s; }
+        .mbtn:hover::after { left: 100%; }
+        .mbtn-reg { background: linear-gradient(135deg, #10b981, #059669, #047857); box-shadow: 0 4px 16px rgba(16,185,129,0.3); }
+        .mbtn-reg:hover { box-shadow: 0 8px 24px rgba(16,185,129,0.4); }
+        .merr { display: none; padding: 12px 16px; border-radius: 12px; font-size: 0.82rem; font-weight: 500;
+            background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); color: #fca5a5;
+            animation: mShake 0.4s ease; }
+        @keyframes mShake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
+        .msec { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 20px;
+            padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.04);
+            color: rgba(148,163,184,0.4); font-size: 0.7rem; font-weight: 500; letter-spacing: 0.5px; }
+        .mform-sec { display: none; animation: mFade 0.4s cubic-bezier(0.16,1,0.3,1); }
+        .mform-sec.active { display: block; }
+        @keyframes mFade { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
+        @media (max-width: 768px) { .auth-box-m { padding: 32px 24px; } }
+    </style>
+</head>
+<body>
+    <!-- ========== TRANG ĐĂNG NHẬP ========== -->
+    <div id="loginScreen" class="auth-page-main">
+        <div class="mparticle" style="width:6px;height:6px;background:#3b82f6;top:20%;left:10%;animation-duration:15s"></div>
+        <div class="mparticle" style="width:4px;height:4px;background:#8b5cf6;top:60%;left:80%;animation-duration:20s;animation-delay:3s"></div>
+        <div class="mparticle" style="width:8px;height:8px;background:#10b981;top:40%;left:30%;animation-duration:18s;animation-delay:5s"></div>
+        <div class="mparticle" style="width:5px;height:5px;background:#f59e0b;top:80%;left:60%;animation-duration:22s;animation-delay:8s"></div>
+        <div class="mparticle" style="width:3px;height:3px;background:#60a5fa;top:10%;left:50%;animation-duration:16s;animation-delay:2s"></div>
+        <div class="mparticle" style="width:7px;height:7px;background:#a78bfa;top:70%;left:20%;animation-duration:25s;animation-delay:6s"></div>
+
+        <div class="auth-card-m">
+            <div class="auth-box-m">
+                <div class="mlogo">
+                    <img src="/static/logo.png" alt="Logo">
+                    <div class="mbrand">THỰC ĐƠN ĐIỆN TỬ</div>
+                    <div class="msub">Quân Đội Nhân Dân Việt Nam</div>
+                </div>
+
+                <div class="mtabs">
+                    <button class="mtab active" id="loginTabBtn" onclick="switchAuthTab('login')">🔐 Đăng Nhập</button>
+                    <button class="mtab" id="registerTabBtn" onclick="switchAuthTab('register')">📝 Đăng Ký</button>
+                </div>
+
+                <div class="merr" id="authError"></div>
+
+                <!-- LOGIN -->
+                <div class="mform-sec active" id="loginSection">
+                    <form class="mform" id="loginFormMain" onsubmit="event.preventDefault();handleAuthSubmit()">
+                        <div class="mfield">
+                            <label>Tên đăng nhập</label>
+                            <div class="minput-wrap">
+                                <span class="minput-icon">👤</span>
+                                <input class="minput" id="inputUsername" type="text" placeholder="Nhập tên đăng nhập" autocomplete="username" required>
+                            </div>
+                        </div>
+                        <div class="mfield">
+                            <label>Mật khẩu</label>
+                            <div class="minput-wrap">
+                                <span class="minput-icon">🔒</span>
+                                <input class="minput" id="inputPassword" type="password" placeholder="Nhập mật khẩu" autocomplete="current-password" required>
+                                <button type="button" class="mpw-toggle" onclick="mTogglePw('inputPassword',this)">👁️</button>
+                            </div>
+                        </div>
+                        <button type="submit" class="mbtn">🔐 Đăng Nhập</button>
+                    </form>
+                </div>
+
+                <!-- REGISTER -->
+                <div class="mform-sec" id="registerSection">
+                    <form class="mform" id="regFormMain" onsubmit="event.preventDefault();handleAuthSubmit()">
+                        <div class="mfield">
+                            <label>Họ và tên</label>
+                            <div class="minput-wrap">
+                                <span class="minput-icon">🪪</span>
+                                <input class="minput" id="inputHoTen" type="text" placeholder="Nhập họ tên đầy đủ" required>
+                            </div>
+                        </div>
+                        <div class="mfield">
+                            <label>Tên đăng nhập</label>
+                            <div class="minput-wrap">
+                                <span class="minput-icon">👤</span>
+                                <input class="minput" id="inputUsernameReg" type="text" placeholder="Ít nhất 4 ký tự" autocomplete="username" required minlength="4">
+                            </div>
+                        </div>
+                        <div class="mfield">
+                            <label>Mật khẩu</label>
+                            <div class="minput-wrap">
+                                <span class="minput-icon">🔒</span>
+                                <input class="minput" id="inputPasswordReg" type="password" placeholder="Ít nhất 6 ký tự" autocomplete="new-password" required minlength="6" oninput="mCheckPw(this.value)">
+                                <button type="button" class="mpw-toggle" onclick="mTogglePw('inputPasswordReg',this)">👁️</button>
+                            </div>
+                            <div class="mpw-str" id="mPwStr" style="display:none">
+                                <div class="mpw-bar"><div class="mpw-fill" id="mPwFill"></div></div>
+                                <div class="mpw-txt" id="mPwTxt"></div>
+                            </div>
+                        </div>
+                        <div class="mfield">
+                            <label>Xác nhận mật khẩu</label>
+                            <div class="minput-wrap">
+                                <span class="minput-icon">🔑</span>
+                                <input class="minput" id="inputPasswordConfirm" type="password" placeholder="Nhập lại mật khẩu" autocomplete="new-password" required>
+                                <button type="button" class="mpw-toggle" onclick="mTogglePw('inputPasswordConfirm',this)">👁️</button>
+                            </div>
+                        </div>
+                        <button type="submit" class="mbtn mbtn-reg">📝 Đăng Ký</button>
+                    </form>
+                </div>
+
+                <div class="msec">🛡️ Bảo mật SSL • Mã hóa mật khẩu AES-256</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== ỨNG DỤNG CHÍNH (ẩn cho tới khi đăng nhập) ========== -->
+    <div id="appRoot" style="display:none">
+        <!-- Mobile menu button -->
+        <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleSidebar()">☰</button>
+        <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
+        
+        <div class="app-container">
+            <!-- SIDEBAR -->
+            <nav class="sidebar" id="sidebar">
+                <div class="sidebar-header">
+                    <div class="sidebar-logo">
+                        <div class="logo-icon">
+                            <img src="/static/logo.png" alt="Logo" class="logo-img">
+                        </div>
+                        <div class="logo-text">
+                            <h1>HOÀNG ANH</h1>
+                            <span>Thực Đơn Điện Tử</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="sidebar-nav">
+                    <div class="nav-section">
+                        <div class="nav-section-title">Thực đơn</div>
+                        <a class="nav-item active" data-page="home" onclick="navigateTo('home')">
+                            <span class="nav-icon">🍜</span>
+                            <span>Thực đơn hôm nay</span>
+                        </a>
+                        <a class="nav-item" data-page="nutrition" onclick="navigateTo('nutrition')">
+                            <span class="nav-icon">📊</span>
+                            <span>Dinh dưỡng</span>
+                        </a>
+                        <a class="nav-item" data-page="weekly" onclick="navigateTo('weekly')">
+                            <span class="nav-icon">📅</span>
+                            <span>Thực đơn tuần</span>
+                        </a>
+                    </div>
+                    
+                    <div class="nav-section">
+                        <div class="nav-section-title">Tương tác</div>
+                        <a class="nav-item" data-page="rating" onclick="navigateTo('rating')">
+                            <span class="nav-icon">⭐</span>
+                            <span>Đánh giá món ăn</span>
+                        </a>
+                        <a class="nav-item" data-page="feedback" onclick="navigateTo('feedback')">
+                            <span class="nav-icon">📮</span>
+                            <span>Hòm thư góp ý</span>
+                            <span class="nav-badge" id="feedbackBadge" style="display:none">0</span>
+                        </a>
+                        <a class="nav-item" data-page="voting" onclick="navigateTo('voting')">
+                            <span class="nav-icon">🗳️</span>
+                            <span>Bình chọn cuối tuần</span>
+                        </a>
+                    </div>
+                    
+                    <div class="nav-section">
+                        <div class="nav-section-title">Đặc biệt</div>
+                        <a class="nav-item" data-page="hometown" onclick="navigateTo('hometown')">
+                            <span class="nav-icon">🏡</span>
+                            <span>Hương vị quê nhà</span>
+                        </a>
+                        <a class="nav-item" data-page="competition" onclick="navigateTo('competition')">
+                            <span class="nav-icon">🏆</span>
+                            <span>Bảng thi đua</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- User bar -->
+                <div id="userBar"></div>
+            </nav>
+            
+            <!-- MAIN CONTENT -->
+            <main class="main-content" id="mainContent">
+                <div class="loading" id="pageLoading">
+                    <div class="loading-spinner"></div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- ========== NÚT LIÊN HỆ NỔI (Zalo + Điện thoại) ========== -->
+    <div class="floating-contact-buttons">
+        <a href="https://zalo.me/0123456789" target="_blank" class="floating-btn zalo-btn" title="Chat Zalo">
+            <svg class="floating-btn-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M24 4C12.954 4 4 12.954 4 24s8.954 20 20 20 20-8.954 20-20S35.046 4 24 4z" fill="#0068FF"/>
+                <path d="M33.5 16H14.5c-.828 0-1.5.672-1.5 1.5v0c0 .828.672 1.5 1.5 1.5h19c.828 0 1.5-.672 1.5-1.5v0c0-.828-.672-1.5-1.5-1.5zM14 22l7 8h-4l4 5v-3h10v-2H21l-3-3.5L21 23h10v-2H14v1z" fill="white"/>
+            </svg>
+            <span class="floating-btn-label">Zalo</span>
+            <span class="floating-pulse-ring"></span>
+        </a>
+        <a href="tel:0123456789" class="floating-btn phone-btn" title="Gọi điện">
+            <svg class="floating-btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" fill="white"/>
+            </svg>
+            <span class="floating-btn-label">Gọi ngay</span>
+            <span class="floating-pulse-ring"></span>
+        </a>
+    </div>
+
+    <!-- ========== CHAT BOX HỖ TRỢ ========== -->
+    <div class="chatbox-container" id="chatboxContainer">
+        <!-- Nút mở chat -->
+        <button class="chatbox-toggle" id="chatboxToggle" onclick="toggleChatBox()" title="Hỗ trợ & Báo lỗi">
+            <svg viewBox="0 0 24 24" fill="none" width="28" height="28">
+                <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4V4c0-1.1-.9-2-2-2z" fill="white"/>
+                <circle cx="8" cy="10" r="1.2" fill="#2a3a5c"/>
+                <circle cx="12" cy="10" r="1.2" fill="#2a3a5c"/>
+                <circle cx="16" cy="10" r="1.2" fill="#2a3a5c"/>
+            </svg>
+            <span class="chatbox-badge" id="chatboxBadge">1</span>
+        </button>
+        
+        <!-- Cửa sổ chat -->
+        <div class="chatbox-window" id="chatboxWindow">
+            <div class="chatbox-header">
+                <div class="chatbox-header-info">
+                    <div class="chatbox-avatar">
+                        <img src="/static/logo.png" alt="Logo" style="width:100%;height:100%;object-fit:contain;">
+                    </div>
+                    <div>
+                        <div class="chatbox-title">Hỗ Trợ HOÀNG ANH</div>
+                        <div class="chatbox-status">🟢 Đang hoạt động</div>
+                    </div>
+                </div>
+                <button class="chatbox-close" onclick="toggleChatBox()">✕</button>
+            </div>
+            <div class="chatbox-messages" id="chatboxMessages">
+                <div class="chat-msg bot">
+                    <div class="chat-bubble">Xin chào! 👋 Tôi có thể giúp gì cho bạn? Bạn có thể:
+                        <br>• <strong>Báo lỗi</strong> hệ thống
+                        <br>• <strong>Góp ý</strong> cải thiện
+                        <br>• <strong>Hỏi đáp</strong> sử dụng
+                    </div>
+                    <div class="chat-time">Hệ thống</div>
+                </div>
+            </div>
+            <div class="chatbox-input-area">
+                <select class="chatbox-type" id="chatboxType">
+                    <option value="support">💬 Hỗ trợ</option>
+                    <option value="bug">🐛 Báo lỗi</option>
+                    <option value="suggest">💡 Góp ý</option>
+                </select>
+                <div class="chatbox-input-row">
+                    <input type="text" class="chatbox-input" id="chatboxInput" placeholder="Nhập tin nhắn..." onkeydown="if(event.key==='Enter')sendChatMessage()">
+                    <button class="chatbox-send" onclick="sendChatMessage()">➤</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast container -->
+    <div class="toast-container" id="toastContainer"></div>
+    
+    <!-- Modal overlay -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModal()">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3 id="modalTitle"></h3>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+    
+    <script src="/static/js/utils.js"></script>
+    <script src="/static/js/pages_home.js"></script>
+    <script src="/static/js/pages_feedback.js"></script>
+    <script src="/static/js/pages_voting.js"></script>
+    <script src="/static/js/pages_mgmt.js"></script>
+    <script src="/static/js/pages_admin.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Trị Viên | HOÀNG ANH</title>
+    <link rel="icon" type="image/png" href="/static/logo.png">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        body { background: var(--bg-primary); margin: 0; }
+
+        /* === AUTH PAGE === */
+        .auth-page {
+            min-height: 100vh; display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, #0a0e27 0%, #0d1b3e 25%, #0f2044 50%, #0a1628 100%);
+            position: relative; overflow: hidden;
+        }
+        .auth-page::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(ellipse at 30% 20%, rgba(59,130,246,0.08) 0%, transparent 50%),
+                        radial-gradient(ellipse at 70% 80%, rgba(147,51,234,0.06) 0%, transparent 50%),
+                        radial-gradient(ellipse at 50% 50%, rgba(16,185,129,0.04) 0%, transparent 50%);
+            animation: bgFloat 20s ease-in-out infinite;
+        }
+        @keyframes bgFloat { 0%,100%{transform:translate(0,0)rotate(0)} 33%{transform:translate(30px,-20px)rotate(1deg)} 66%{transform:translate(-20px,15px)rotate(-1deg)} }
+
+        /* Floating particles */
+        .particle {
+            position: absolute; border-radius: 50%; pointer-events: none; opacity: 0.15;
+            animation: particleFloat linear infinite;
+        }
+        @keyframes particleFloat { 0%{transform:translateY(100vh) rotate(0)} 100%{transform:translateY(-100vh) rotate(720deg)} }
+
+        /* Auth container */
+        .auth-container {
+            position: relative; z-index: 10; width: 100%; max-width: 480px; padding: 20px;
+        }
+        .auth-card {
+            background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid rgba(255,255,255,0.08); border-radius: 24px;
+            padding: 48px 40px; box-shadow: 0 32px 64px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05) inset;
+            animation: cardEnter 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes cardEnter { from{opacity:0;transform:translateY(30px)scale(0.95)} to{opacity:1;transform:translateY(0)scale(1)} }
+
+        /* Logo section */
+        .auth-logo { text-align: center; margin-bottom: 32px; }
+        .auth-logo-img {
+            width: 80px; height: 80px; border-radius: 20px; object-fit: cover;
+            box-shadow: 0 8px 32px rgba(59,130,246,0.25); border: 2px solid rgba(59,130,246,0.3);
+            animation: logoPulse 3s ease-in-out infinite;
+        }
+        @keyframes logoPulse { 0%,100%{box-shadow:0 8px 32px rgba(59,130,246,0.25)} 50%{box-shadow:0 8px 48px rgba(59,130,246,0.4)} }
+        .auth-brand { font-size: 1.6rem; font-weight: 800; letter-spacing: 2px; margin-top: 16px;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa, #34d399);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-size: 200% 200%;
+            animation: gradientShift 4s ease infinite;
+        }
+        @keyframes gradientShift { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
+        .auth-subtitle { color: rgba(148,163,184,0.8); font-size: 0.85rem; margin-top: 6px; font-weight: 400; }
+
+        /* Tab switcher */
+        .auth-tabs {
+            display: flex; gap: 4px; background: rgba(255,255,255,0.04); border-radius: 14px;
+            padding: 4px; margin-bottom: 28px;
+        }
+        .auth-tab {
+            flex: 1; padding: 12px 0; text-align: center; border-radius: 12px; font-size: 0.85rem;
+            font-weight: 600; color: rgba(148,163,184,0.7); cursor: pointer; transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+            border: none; background: none; letter-spacing: 0.5px;
+        }
+        .auth-tab:hover { color: rgba(148,163,184,1); }
+        .auth-tab.active {
+            background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(147,51,234,0.15));
+            color: #f1f5f9; box-shadow: 0 2px 12px rgba(59,130,246,0.15);
+            border: 1px solid rgba(59,130,246,0.2);
+        }
+
+        /* Form inputs */
+        .auth-form { display: flex; flex-direction: column; gap: 16px; }
+        .auth-field { position: relative; }
+        .auth-field label {
+            display: block; font-size: 0.75rem; font-weight: 600; color: rgba(148,163,184,0.9);
+            margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1.5px;
+        }
+        .auth-input-wrap {
+            position: relative; display: flex; align-items: center;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px; transition: all 0.3s; overflow: hidden;
+        }
+        .auth-input-wrap:focus-within {
+            border-color: rgba(59,130,246,0.5); box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+            background: rgba(255,255,255,0.06);
+        }
+        .auth-input-icon {
+            padding: 0 0 0 16px; font-size: 1.1rem; color: rgba(148,163,184,0.5);
+            flex-shrink: 0; transition: color 0.3s;
+        }
+        .auth-input-wrap:focus-within .auth-input-icon { color: #60a5fa; }
+        .auth-input {
+            flex: 1; padding: 14px 16px; font-size: 0.9rem; color: #f1f5f9;
+            background: transparent; border: none; outline: none; font-family: 'Inter', sans-serif;
+        }
+        .auth-input::placeholder { color: rgba(148,163,184,0.4); }
+        .auth-input:-webkit-autofill { -webkit-text-fill-color: #f1f5f9; transition: background-color 5000s ease-in-out 0s; }
+
+        /* Password toggle */
+        .pw-toggle {
+            padding: 0 14px; cursor: pointer; font-size: 1.1rem; color: rgba(148,163,184,0.4);
+            transition: color 0.2s; background: none; border: none; flex-shrink: 0;
+        }
+        .pw-toggle:hover { color: #60a5fa; }
+
+        /* Password strength */
+        .pw-strength { margin-top: 8px; }
+        .pw-strength-bar {
+            height: 4px; border-radius: 4px; background: rgba(255,255,255,0.06);
+            overflow: hidden; margin-bottom: 4px;
+        }
+        .pw-strength-fill { height: 100%; border-radius: 4px; transition: all 0.4s cubic-bezier(0.4,0,0.2,1); width: 0; }
+        .pw-strength-text { font-size: 0.7rem; font-weight: 500; }
+        .pw-weak { width: 25%; background: #ef4444; }
+        .pw-medium { width: 50%; background: #f59e0b; }
+        .pw-good { width: 75%; background: #3b82f6; }
+        .pw-strong { width: 100%; background: #10b981; }
+
+        /* Submit button */
+        .auth-btn {
+            width: 100%; padding: 16px; border: none; border-radius: 14px; font-size: 0.95rem;
+            font-weight: 700; letter-spacing: 0.5px; cursor: pointer; position: relative; overflow: hidden;
+            color: white; margin-top: 4px;
+            background: linear-gradient(135deg, #3b82f6, #6366f1, #8b5cf6);
+            box-shadow: 0 4px 16px rgba(59,130,246,0.3); transition: all 0.3s;
+        }
+        .auth-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(59,130,246,0.4); }
+        .auth-btn:active { transform: translateY(0); }
+        .auth-btn::after {
+            content:''; position:absolute; top:-50%; left:-50%; width:200%; height:200%;
+            background: linear-gradient(transparent, rgba(255,255,255,0.08), transparent);
+            transform: rotate(45deg); transition: 0.5s;
+        }
+        .auth-btn:hover::after { left: 100%; }
+        .auth-btn.register-btn { background: linear-gradient(135deg, #10b981, #059669, #047857); box-shadow: 0 4px 16px rgba(16,185,129,0.3); }
+        .auth-btn.register-btn:hover { box-shadow: 0 8px 24px rgba(16,185,129,0.4); }
+
+        /* Error alert */
+        .auth-error {
+            display: none; padding: 12px 16px; border-radius: 12px; font-size: 0.82rem; font-weight: 500;
+            background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); color: #fca5a5;
+            animation: errorShake 0.4s ease;
+        }
+        @keyframes errorShake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
+
+        /* Success alert */
+        .auth-success {
+            display: none; padding: 12px 16px; border-radius: 12px; font-size: 0.82rem; font-weight: 500;
+            background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); color: #6ee7b7;
+        }
+
+        /* Footer */
+        .auth-footer { text-align: center; margin-top: 24px; }
+        .auth-footer a { color: rgba(148,163,184,0.6); font-size: 0.8rem; text-decoration: none; transition: color 0.2s; }
+        .auth-footer a:hover { color: #60a5fa; }
+
+        /* Security badge */
+        .security-badge {
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            margin-top: 20px; padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.04);
+            color: rgba(148,163,184,0.4); font-size: 0.7rem; font-weight: 500; letter-spacing: 0.5px;
+        }
+
+        /* Form transitions */
+        .auth-form-section { display: none; animation: formFade 0.4s cubic-bezier(0.16,1,0.3,1); }
+        .auth-form-section.active { display: block; }
+        @keyframes formFade { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
+
+        /* === ADMIN LAYOUT (unchanged) === */
+        .admin-layout { display: flex; min-height: 100vh; }
+        .admin-sidebar {
+            width: 250px; background: var(--bg-card); border-right: 1px solid var(--border);
+            display: flex; flex-direction: column; position: fixed; top: 0; bottom: 0; left: 0; z-index: 100;
+        }
+        .admin-sidebar .sidebar-header { padding: 16px; border-bottom: 1px solid var(--border); }
+        .admin-sidebar .sidebar-header h1 { font-size: 0.9rem; color: var(--accent); margin: 0; }
+        .admin-sidebar .sidebar-header span { font-size: 0.7rem; color: var(--text-muted); }
+        .admin-nav { flex: 1; padding: 12px; overflow-y: auto; }
+        .admin-nav-item {
+            display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px;
+            color: var(--text-secondary); cursor: pointer; font-size: 0.85rem; transition: all 0.2s;
+            text-decoration: none; margin-bottom: 4px;
+        }
+        .admin-nav-item:hover { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+        .admin-nav-item.active { background: rgba(var(--accent-rgb), 0.15); color: var(--accent); font-weight: 700; }
+        .admin-nav-item .icon { font-size: 1.1rem; width: 24px; text-align: center; }
+        .admin-main { flex: 1; margin-left: 250px; padding: 24px; min-height: 100vh; }
+        .admin-user-bar { padding: 12px 16px; border-top: 1px solid var(--border); }
+        .admin-user-info { display: flex; align-items: center; gap: 8px; }
+        .admin-avatar {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.85rem; font-weight: 700; color: white;
+        }
+        .admin-user-name { font-size: 0.8rem; font-weight: 700; color: var(--text-primary); }
+        .admin-user-role { font-size: 0.65rem; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
+        .back-link { display: flex; align-items: center; gap: 6px; color: var(--text-muted); font-size: 0.8rem; text-decoration: none; padding: 8px 14px; border-radius: 8px; margin-bottom: 8px; }
+        .back-link:hover { background: rgba(255,255,255,0.05); color: var(--accent); }
+
+        @media (max-width: 768px) {
+            .admin-sidebar { width: 100%; height: auto; position: relative; }
+            .admin-main { margin-left: 0; }
+            .admin-layout { flex-direction: column; }
+            .auth-card { padding: 32px 24px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- LOGIN/REGISTER PAGE -->
+    <div id="adminLoginGate" class="auth-page">
+        <!-- Floating particles -->
+        <div class="particle" style="width:6px;height:6px;background:#3b82f6;top:20%;left:10%;animation-duration:15s;animation-delay:0s"></div>
+        <div class="particle" style="width:4px;height:4px;background:#8b5cf6;top:60%;left:80%;animation-duration:20s;animation-delay:3s"></div>
+        <div class="particle" style="width:8px;height:8px;background:#10b981;top:40%;left:30%;animation-duration:18s;animation-delay:5s"></div>
+        <div class="particle" style="width:5px;height:5px;background:#f59e0b;top:80%;left:60%;animation-duration:22s;animation-delay:8s"></div>
+        <div class="particle" style="width:3px;height:3px;background:#60a5fa;top:10%;left:50%;animation-duration:16s;animation-delay:2s"></div>
+        <div class="particle" style="width:7px;height:7px;background:#a78bfa;top:70%;left:20%;animation-duration:25s;animation-delay:6s"></div>
+
+        <div class="auth-container">
+            <div class="auth-card">
+                <!-- Logo -->
+                <div class="auth-logo">
+                    <img src="/static/logo.png" alt="Logo" class="auth-logo-img">
+                    <div class="auth-brand">HOÀNG ANH</div>
+                    <div class="auth-subtitle">Hệ Thống Thực Đơn Điện Tử Quân Đội</div>
+                </div>
+
+                <!-- Tabs -->
+                <div class="auth-tabs">
+                    <button class="auth-tab active" onclick="switchAuthTab('login')">🔐 Đăng Nhập</button>
+                    <button class="auth-tab" onclick="switchAuthTab('register')">📝 Đăng Ký</button>
+                </div>
+
+                <!-- Error / Success -->
+                <div class="auth-error" id="authError"></div>
+                <div class="auth-success" id="authSuccess"></div>
+
+                <!-- LOGIN FORM -->
+                <div class="auth-form-section active" id="loginSection">
+                    <form class="auth-form" id="loginForm">
+                        <div class="auth-field">
+                            <label>Tên đăng nhập</label>
+                            <div class="auth-input-wrap">
+                                <span class="auth-input-icon">👤</span>
+                                <input class="auth-input" id="loginUser" type="text" placeholder="Nhập tên đăng nhập" autocomplete="username" required>
+                            </div>
+                        </div>
+                        <div class="auth-field">
+                            <label>Mật khẩu</label>
+                            <div class="auth-input-wrap">
+                                <span class="auth-input-icon">🔒</span>
+                                <input class="auth-input" id="loginPass" type="password" placeholder="Nhập mật khẩu" autocomplete="current-password" required>
+                                <button type="button" class="pw-toggle" onclick="togglePassword('loginPass', this)">👁️</button>
+                            </div>
+                        </div>
+                        <button type="submit" class="auth-btn">🔐 Đăng Nhập Quản Trị</button>
+                    </form>
+                </div>
+
+                <!-- REGISTER FORM -->
+                <div class="auth-form-section" id="registerSection">
+                    <form class="auth-form" id="registerForm">
+                        <div class="auth-field">
+                            <label>Họ và tên</label>
+                            <div class="auth-input-wrap">
+                                <span class="auth-input-icon">🪪</span>
+                                <input class="auth-input" id="regName" type="text" placeholder="Nhập họ tên đầy đủ" required>
+                            </div>
+                        </div>
+                        <div class="auth-field">
+                            <label>Tên đăng nhập</label>
+                            <div class="auth-input-wrap">
+                                <span class="auth-input-icon">👤</span>
+                                <input class="auth-input" id="regUser" type="text" placeholder="Ít nhất 4 ký tự" autocomplete="username" required minlength="4">
+                            </div>
+                        </div>
+                        <div class="auth-field">
+                            <label>Tên đơn vị</label>
+                            <div class="auth-input-wrap">
+                                <span class="auth-input-icon">🏛️</span>
+                                <input class="auth-input" id="regUnit" type="text" placeholder="Tên đơn vị quản lý" required>
+                            </div>
+                        </div>
+                        <div class="auth-field">
+                            <label>Mật khẩu</label>
+                            <div class="auth-input-wrap">
+                                <span class="auth-input-icon">🔒</span>
+                                <input class="auth-input" id="regPass" type="password" placeholder="Ít nhất 6 ký tự" autocomplete="new-password" required minlength="6" oninput="checkPwStrength(this.value)">
+                                <button type="button" class="pw-toggle" onclick="togglePassword('regPass', this)">👁️</button>
+                            </div>
+                            <div class="pw-strength" id="pwStrength" style="display:none">
+                                <div class="pw-strength-bar"><div class="pw-strength-fill" id="pwFill"></div></div>
+                                <div class="pw-strength-text" id="pwText"></div>
+                            </div>
+                        </div>
+                        <div class="auth-field">
+                            <label>Xác nhận mật khẩu</label>
+                            <div class="auth-input-wrap">
+                                <span class="auth-input-icon">🔑</span>
+                                <input class="auth-input" id="regPassConfirm" type="password" placeholder="Nhập lại mật khẩu" autocomplete="new-password" required>
+                                <button type="button" class="pw-toggle" onclick="togglePassword('regPassConfirm', this)">👁️</button>
+                            </div>
+                        </div>
+                        <button type="submit" class="auth-btn register-btn">📝 Đăng Ký Tài Khoản</button>
+                    </form>
+                </div>
+
+                <div class="security-badge">🛡️ Bảo mật SSL • Mã hóa mật khẩu AES-256</div>
+
+                <div class="auth-footer">
+                    <a href="/">← Quay về trang chính</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN PANEL -->
+    <div id="adminPanel" style="display:none;">
+        <div class="admin-layout">
+            <nav class="admin-sidebar">
+                <div class="sidebar-header">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <div class="logo-icon" style="width:40px;height:40px;">
+                            <img src="/static/logo.png" alt="Logo" class="logo-img">
+                        </div>
+                        <div>
+                            <h1>HOÀNG ANH</h1>
+                            <span>Quản Trị Viên</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="admin-nav">
+                    <a class="back-link" href="/">← Về trang chính</a>
+                    <a class="admin-nav-item active" data-tab="menu" onclick="switchAdminPage('menu', this)">
+                        <span class="icon">📅</span> Thực đơn theo ngày
+                    </a>
+                    <a class="admin-nav-item" data-tab="dishes" onclick="switchAdminPage('dishes', this)">
+                        <span class="icon">🍽️</span> Quản lý món ăn
+                    </a>
+                    <a class="admin-nav-item" data-tab="users" onclick="switchAdminPage('users', this)">
+                        <span class="icon">👥</span> Quản lý người dùng
+                    </a>
+                    <a class="admin-nav-item" data-tab="announce" onclick="switchAdminPage('announce', this)">
+                        <span class="icon">📢</span> Thông báo hậu cần
+                    </a>
+                    <a class="admin-nav-item" data-tab="competition" onclick="switchAdminPage('competition', this)">
+                        <span class="icon">🏆</span> Nhập điểm thi đua
+                    </a>
+                    <a class="admin-nav-item" data-tab="waste" onclick="switchAdminPage('waste', this)">
+                        <span class="icon">♻️</span> Nhập thực phẩm thừa
+                    </a>
+                </div>
+                <div class="admin-user-bar">
+                    <div class="admin-user-info">
+                        <div class="admin-avatar" id="adminAvatarEl">A</div>
+                        <div style="flex:1;">
+                            <div class="admin-user-name" id="adminNameEl">Admin</div>
+                            <div class="admin-user-role">🎖️ Quản trị viên</div>
+                        </div>
+                        <button onclick="adminLogout()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:1rem;" title="Đăng xuất">🚪</button>
+                    </div>
+                </div>
+            </nav>
+            <main class="admin-main" id="adminContent">
+                <div class="loading"><div class="loading-spinner"></div></div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Toast + Modal -->
+    <div class="toast-container" id="toastContainer"></div>
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModal()">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3 id="modalTitle"></h3>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script src="/static/js/utils.js"></script>
+    <script src="/static/js/admin_app.js"></script>
+    <script>
+    // === AUTH HELPERS ===
+    function switchAuthTab(tab) {
+        document.querySelectorAll('.auth-tab').forEach((t, i) => {
+            t.classList.toggle('active', (tab === 'login' && i === 0) || (tab === 'register' && i === 1));
+        });
+        document.getElementById('loginSection').classList.toggle('active', tab === 'login');
+        document.getElementById('registerSection').classList.toggle('active', tab === 'register');
+        document.getElementById('authError').style.display = 'none';
+        document.getElementById('authSuccess').style.display = 'none';
+    }
+
+    function togglePassword(inputId, btn) {
+        const inp = document.getElementById(inputId);
+        if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+        else { inp.type = 'password'; btn.textContent = '👁️'; }
+    }
+
+    function checkPwStrength(pw) {
+        const el = document.getElementById('pwStrength');
+        const fill = document.getElementById('pwFill');
+        const text = document.getElementById('pwText');
+        if (!pw) { el.style.display = 'none'; return; }
+        el.style.display = 'block';
+        let score = 0;
+        if (pw.length >= 6) score++;
+        if (pw.length >= 8) score++;
+        if (/[A-Z]/.test(pw)) score++;
+        if (/[0-9]/.test(pw)) score++;
+        if (/[^A-Za-z0-9]/.test(pw)) score++;
+        fill.className = 'pw-strength-fill';
+        if (score <= 1) { fill.classList.add('pw-weak'); text.textContent = '⚠️ Yếu'; text.style.color = '#ef4444'; }
+        else if (score <= 2) { fill.classList.add('pw-medium'); text.textContent = '⚡ Trung bình'; text.style.color = '#f59e0b'; }
+        else if (score <= 3) { fill.classList.add('pw-good'); text.textContent = '💪 Tốt'; text.style.color = '#3b82f6'; }
+        else { fill.classList.add('pw-strong'); text.textContent = '🛡️ Rất mạnh'; text.style.color = '#10b981'; }
+    }
+
+    function showAuthError(msg) {
+        const el = document.getElementById('authError');
+        el.textContent = msg; el.style.display = 'block';
+        document.getElementById('authSuccess').style.display = 'none';
+    }
+    function showAuthSuccess(msg) {
+        const el = document.getElementById('authSuccess');
+        el.textContent = msg; el.style.display = 'block';
+        document.getElementById('authError').style.display = 'none';
+    }
+
+    // Login form
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const un = document.getElementById('loginUser').value.trim();
+        const pw = document.getElementById('loginPass').value;
+        if (!un || !pw) return showAuthError('Vui lòng điền đầy đủ thông tin');
+        try {
+            const user = await API.post('/api/auth/login', { ten_dang_nhap: un, mat_khau: pw });
+            if (user.vai_tro !== 'admin') return showAuthError('Tài khoản không có quyền quản trị viên');
+            adminUser = user;
+            showAdminPanel();
+            showToast('Chào mừng quản trị viên!', 'success');
+        } catch(e) {
+            showAuthError('Sai tên đăng nhập hoặc mật khẩu');
+        }
+    });
+
+    // Register form
+    document.getElementById('registerForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const hoTen = document.getElementById('regName').value.trim();
+        const tenDn = document.getElementById('regUser').value.trim();
+        const tenDv = document.getElementById('regUnit').value.trim();
+        const pw = document.getElementById('regPass').value;
+        const pwConfirm = document.getElementById('regPassConfirm').value;
+        if (!hoTen || !tenDn || !tenDv || !pw) return showAuthError('Vui lòng điền đầy đủ thông tin');
+        if (tenDn.length < 4) return showAuthError('Tên đăng nhập phải có ít nhất 4 ký tự');
+        if (pw.length < 6) return showAuthError('Mật khẩu phải có ít nhất 6 ký tự');
+        if (pw !== pwConfirm) return showAuthError('Mật khẩu xác nhận không khớp');
+        try {
+            const user = await API.post('/api/auth/register', {
+                ho_ten: hoTen, ten_dang_nhap: tenDn, mat_khau: pw,
+                vai_tro: 'admin', ten_don_vi: tenDv
+            });
+            adminUser = user;
+            showAdminPanel();
+            showToast('Đăng ký thành công! Chào mừng quản trị viên!', 'success');
+        } catch(e) {
+            showAuthError(e.message || 'Đăng ký thất bại. Tên đăng nhập có thể đã tồn tại.');
+        }
+    });
+    </script>
+</body>
+</html>

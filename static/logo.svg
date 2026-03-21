@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 450" fill="none">
+  <defs>
+    <linearGradient id="starGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4a6a9c"/>
+      <stop offset="50%" stop-color="#2d4a7a"/>
+      <stop offset="100%" stop-color="#1a2a4a"/>
+    </linearGradient>
+    <linearGradient id="flameGrad" x1="0.5" y1="1" x2="0.5" y2="0">
+      <stop offset="0%" stop-color="#2d4a7a"/>
+      <stop offset="100%" stop-color="#4a7ab8"/>
+    </linearGradient>
+    <linearGradient id="textGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#3a5a8c"/>
+      <stop offset="100%" stop-color="#1a2a4a"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Star shape -->
+  <g transform="translate(200, 195)">
+    <!-- 5-pointed star -->
+    <polygon points="0,-130 30,-42 120,-42 50,16 74,104 0,50 -74,104 -50,16 -120,-42 -30,-42" 
+      fill="none" stroke="url(#starGrad)" stroke-width="20" stroke-linejoin="round"/>
+    
+    <!-- Flame element - right side rising from the star -->
+    <path d="M 30,-42 C 50,-80 80,-60 75,-100 C 95,-70 110,-90 100,-130 
+             C 120,-90 140,-60 120,-30 C 100,0 80,-10 75,20 
+             C 70,0 60,-20 50,-10 C 40,10 30,-20 30,-42 Z" 
+      fill="url(#flameGrad)" opacity="0.95"/>
+    
+    <!-- Second flame wave -->
+    <path d="M 55,-30 C 70,-60 85,-40 90,-80 
+             C 105,-50 115,-65 110,-100 
+             C 125,-70 135,-45 120,-20 
+             C 105,5 90,-5 85,15 
+             C 80,0 72,-15 65,-8 C 58,5 50,-15 55,-30 Z" 
+      fill="url(#flameGrad)" opacity="0.7"/>
+  </g>
+  
+  <!-- Text HOÀNG ANH -->
+  <text x="200" y="405" text-anchor="middle" 
+    font-family="'Inter', 'Arial', sans-serif" font-size="36" font-weight="700" 
+    letter-spacing="8" fill="url(#textGrad)">HOÀNG ANH</text>
+</svg>

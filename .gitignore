@@ -1,0 +1,31 @@
+# Node.js
+node_modules/
+npm-debug.log*
+
+# Python (legacy)
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.venv/
+
+# Distribution
+dist/
+build/
+*.egg-info/
+
+# Database (SQLite)
+instance/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Uploads
+static/uploads/*
+!static/uploads/.gitkeep

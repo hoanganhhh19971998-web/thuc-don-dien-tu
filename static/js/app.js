@@ -29,6 +29,7 @@ async function navigateTo(page) {
     // Close sidebar on mobile
     document.getElementById('sidebar').classList.remove('open');
     document.getElementById('mobileOverlay').classList.remove('active');
+    document.body.classList.remove('sidebar-open');
 
     // Update title
     document.title = `${PAGES[page].title} | Thực Đơn Điện Tử Quân Đội`;

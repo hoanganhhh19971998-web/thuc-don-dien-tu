@@ -113,9 +113,22 @@ function dishEmoji(loai) {
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('mobileOverlay');
-    sidebar.classList.toggle('open');
-    overlay.classList.toggle('active');
+    const isOpen = sidebar.classList.toggle('open');
+    overlay.classList.toggle('active', isOpen);
+    document.body.classList.toggle('sidebar-open', isOpen);
 }
+
+// Close sidebar on overlay touch (important for mobile)
+document.addEventListener('DOMContentLoaded', () => {
+    const overlay = document.getElementById('mobileOverlay');
+    if (overlay) {
+        // Use touchstart for faster response on mobile
+        overlay.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            toggleSidebar();
+        }, { passive: false });
+    }
+});
 
 // === IMAGE PREVIEW ===
 function setupImagePreview(inputId, previewId) {

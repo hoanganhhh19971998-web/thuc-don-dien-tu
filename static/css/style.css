@@ -1399,18 +1399,21 @@ tr:hover td {
     position: fixed;
     top: var(--space-md);
     left: var(--space-md);
-    z-index: 200;
-    width: 44px;
-    height: 44px;
+    z-index: 500;
+    width: 48px;
+    height: 48px;
     background: var(--bg-glass);
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     color: var(--text-primary);
-    font-size: 1.2rem;
+    font-size: 1.4rem;
     cursor: pointer;
     align-items: center;
     justify-content: center;
+    -webkit-tap-highlight-color: rgba(74, 122, 184, 0.3);
+    touch-action: manipulation;
 }
 
 .mobile-overlay {
@@ -1420,8 +1423,10 @@ tr:hover td {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.5);
-    z-index: 99;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 399;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
 }
 
 /* === RESPONSIVE === */
@@ -1432,27 +1437,20 @@ tr:hover td {
     
     .mobile-menu-btn {
         display: flex;
-        width: 48px;
-        height: 48px;
-        font-size: 1.4rem;
-        z-index: 201;
     }
     
     .sidebar {
         transform: translateX(-100%);
-        z-index: 300;
+        z-index: 400;
         width: var(--sidebar-width);
         -webkit-overflow-scrolling: touch;
         overflow-y: auto;
+        padding-bottom: 80px;
     }
     
     .sidebar.open {
         transform: translateX(0);
-        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
-    }
-    
-    .mobile-overlay {
-        z-index: 299;
+        box-shadow: 4px 0 30px rgba(0, 0, 0, 0.6);
     }
     
     .mobile-overlay.active {
@@ -1484,6 +1482,15 @@ tr:hover td {
     
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-sm);
+    }
+    
+    .stat-card .stat-value {
+        font-size: 1.5rem;
+    }
+    
+    .stat-card .stat-label {
+        font-size: 0.65rem;
     }
     
     .meals-grid {
@@ -1537,21 +1544,85 @@ tr:hover td {
         padding: var(--space-md);
     }
     
-    /* Stat cards - tap friendly */
     .stat-card {
         padding: var(--space-md);
     }
     
-    /* Page header */
     .page-header h2 {
         font-size: 1.4rem;
     }
     
-    /* Modal - full width on mobile */
     .modal {
         width: 95%;
         max-height: 85vh;
         padding: var(--space-lg);
+    }
+    
+    /* Hide floating buttons when sidebar is open to prevent overlap */
+    .sidebar.open ~ .floating-contact-buttons,
+    body.sidebar-open .floating-contact-buttons {
+        display: none;
+    }
+    
+    /* Floating buttons - move up to avoid bottom edge */
+    .floating-contact-buttons {
+        left: 12px;
+        bottom: 80px;
+    }
+    
+    .floating-btn {
+        width: 44px;
+        height: 44px;
+    }
+    
+    .floating-btn-icon {
+        width: 22px;
+        height: 22px;
+    }
+    
+    /* No hover expand on mobile */
+    .floating-btn:hover {
+        width: 44px;
+        border-radius: 50%;
+        padding: 0;
+    }
+    
+    .floating-btn:hover .floating-btn-label {
+        display: none;
+    }
+    
+    /* Chatbox on mobile */
+    .chatbox-container {
+        right: 12px;
+        bottom: 12px;
+    }
+    
+    .chatbox-toggle {
+        width: 48px;
+        height: 48px;
+    }
+    
+    .chatbox-window {
+        width: calc(100vw - 24px);
+        right: -12px;
+        max-height: 70vh;
+    }
+    
+    /* Leaderboard responsive */
+    .leaderboard-item {
+        flex-wrap: wrap;
+        gap: var(--space-sm);
+        padding: var(--space-md);
+    }
+    
+    /* Tables scroll on mobile */
+    .table-container {
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Grid helpers */
+    .grid-2, .grid-3 {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -1567,9 +1638,40 @@ tr:hover td {
     .birthday-grid {
         grid-template-columns: 1fr;
     }
+    
+    .stat-card .stat-icon {
+        font-size: 1.5rem;
+    }
+    
+    .stat-card .stat-value {
+        font-size: 1.3rem;
+    }
+    
+    .page-header h2 {
+        font-size: 1.2rem;
+    }
+    
+    .page-header p {
+        font-size: 0.8rem;
+    }
+    
+    .main-content {
+        padding: var(--space-sm);
+        padding-top: 64px;
+    }
+    
+    .hometown-card {
+        padding: var(--space-lg);
+    }
+    
+    .hometown-title {
+        font-size: 1.2rem;
+    }
+    
+    .hometown-emoji {
+        font-size: 3rem;
+    }
 }
-
-/* === ANIMATIONS === */
 @keyframes fadeInUp {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
@@ -2096,31 +2198,3 @@ tr:hover td {
     box-shadow: 0 4px 12px var(--primary-glow);
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .floating-contact-buttons {
-        left: 14px;
-        bottom: 14px;
-    }
-    .floating-btn {
-        width: 48px;
-        height: 48px;
-    }
-    .floating-btn-icon {
-        width: 22px;
-        height: 22px;
-    }
-    .chatbox-container {
-        right: 14px;
-        bottom: 14px;
-    }
-    .chatbox-toggle {
-        width: 52px;
-        height: 52px;
-    }
-    .chatbox-window {
-        width: calc(100vw - 28px);
-        right: -14px;
-        max-height: 70vh;
-    }
-}

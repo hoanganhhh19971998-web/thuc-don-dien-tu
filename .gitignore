@@ -15,8 +15,15 @@ dist/
 build/
 *.egg-info/
 
-# Database (SQLite)
-instance/
+# Database temp files (keep DB itself)
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Deploy temp
+deploy.js
+fix_push.js
+_tmp_*.js
 
 # IDE
 .vscode/

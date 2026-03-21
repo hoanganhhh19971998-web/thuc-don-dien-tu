@@ -211,8 +211,12 @@
 
     <!-- ========== ỨNG DỤNG CHÍNH (ẩn cho tới khi đăng nhập) ========== -->
     <div id="appRoot" style="display:none">
-        <!-- Mobile menu button -->
-        <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleSidebar()">☰</button>
+        <!-- Mobile top bar -->
+        <div class="mobile-top-bar" id="mobileTopBar">
+            <button class="mobile-back-btn" id="mobileBackBtn" onclick="goBack()" title="Quay lại">‹</button>
+            <span class="mobile-page-title" id="mobilePageTitle">🍜 Thực đơn hôm nay</span>
+            <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleSidebar()">☰</button>
+        </div>
         <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
         
         <div class="app-container">

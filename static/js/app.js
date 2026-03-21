@@ -17,9 +17,16 @@ const PAGES = {
 };
 
 let currentPage = 'home';
+let pageHistory = [];
 
-async function navigateTo(page) {
+async function navigateTo(page, addToHistory = true) {
     if (!PAGES[page]) return;
+
+    // Track history for back button
+    if (addToHistory && currentPage !== page) {
+        pageHistory.push(currentPage);
+        if (pageHistory.length > 20) pageHistory.shift();
+    }
 
     // Update active nav
     document.querySelectorAll('.nav-item').forEach(el => {
@@ -34,6 +41,14 @@ async function navigateTo(page) {
     // Update title
     document.title = `${PAGES[page].title} | Thực Đơn Điện Tử Quân Đội`;
     currentPage = page;
+
+    // Update mobile top bar
+    const mobileTitle = document.getElementById('mobilePageTitle');
+    const backBtn = document.getElementById('mobileBackBtn');
+    if (mobileTitle) mobileTitle.textContent = PAGES[page].title;
+    if (backBtn) {
+        backBtn.classList.toggle('hidden', page === 'home');
+    }
 
     // Show loading
     document.getElementById('mainContent').innerHTML = `
@@ -51,6 +66,16 @@ async function navigateTo(page) {
                 <div class="empty-text">Lỗi tải trang: ${e.message}</div>
             </div>`;
         console.error(e);
+    }
+}
+
+// Back button
+function goBack() {
+    if (pageHistory.length > 0) {
+        const prevPage = pageHistory.pop();
+        navigateTo(prevPage, false);
+    } else {
+        navigateTo('home', false);
     }
 }
 

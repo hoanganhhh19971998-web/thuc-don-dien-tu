@@ -110,11 +110,24 @@ async function handleAuthSubmit() {
         if (pw !== pwConfirm) { errEl.textContent = 'Mật khẩu xác nhận không khớp'; errEl.style.display = 'block'; return; }
         try {
             const user = await API.post('/api/auth/register', { ten_dang_nhap: un, mat_khau: pw, ho_ten: hoTen });
-            currentUser = user;
-            enterApp(user);
-            showToast(`Đăng ký thành công! Chào ${user.ho_ten} 🎉`, 'success');
+            // Đăng xuất session vừa tạo khi đăng ký, yêu cầu đăng nhập lại
+            try { await API.post('/api/auth/logout'); } catch(_) {}
+            // Chuyển về tab đăng nhập
+            switchAuthTab('login');
+            // Điền sẵn tên đăng nhập
+            document.getElementById('inputUsername').value = un;
+            document.getElementById('inputPassword').value = '';
+            document.getElementById('inputPassword').focus();
+            // Xóa form đăng ký
+            document.getElementById('inputHoTen').value = '';
+            document.getElementById('inputUsernameReg').value = '';
+            document.getElementById('inputPasswordReg').value = '';
+            document.getElementById('inputPasswordConfirm').value = '';
+            const pwStr = document.getElementById('mPwStr');
+            if (pwStr) pwStr.style.display = 'none';
+            showToast(`Đăng ký thành công! Vui lòng đăng nhập 🎉`, 'success');
         } catch (e) {
-            errEl.textContent = 'Tên đăng nhập đã tồn tại hoặc lỗi';
+            errEl.textContent = e.message || 'Tên đăng nhập đã tồn tại hoặc lỗi';
             errEl.style.display = 'block';
         }
     } else {

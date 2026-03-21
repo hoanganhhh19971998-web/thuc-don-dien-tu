@@ -11,19 +11,27 @@ const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Trust Render's reverse proxy (required for secure cookies over HTTPS)
+app.set('trust proxy', 1);
+
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({ origin: true, credentials: true }));
+app.use(cors({
+  origin: true,
+  credentials: true
+}));
 
 // Session
+const isProduction = process.env.NODE_ENV === 'production';
 app.use(session({
   secret: process.env.SECRET_KEY || 'quan-doi-thuc-don-2026-v2',
   resave: false,
   saveUninitialized: false,
   cookie: {
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
+    sameSite: isProduction ? 'none' : 'lax',
+    secure: isProduction,
+    httpOnly: true,
     maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
   }
 }));

@@ -28,7 +28,10 @@ router.post('/api/auth/register', (req, res) => {
     VALUES (?, ?, ?, ?, ?, ?, ?)`).run(tenDn, hoTen, email || '', hash, vai_tro, donViId, chien_si_id || null);
   const user = db.prepare('SELECT * FROM nguoi_dung WHERE id = ?').get(result.lastInsertRowid);
   req.session.user = nguoiDungToDict(user);
-  res.status(201).json(req.session.user);
+  req.session.save((err) => {
+    if (err) return res.status(500).json({ error: 'Session error' });
+    res.status(201).json(req.session.user);
+  });
 });
 
 // Đăng nhập
@@ -41,7 +44,10 @@ router.post('/api/auth/login', (req, res) => {
   }
   if (!user.kich_hoat) return res.status(403).json({ error: 'Tài khoản đã bị khóa' });
   req.session.user = nguoiDungToDict(user);
-  res.json(req.session.user);
+  req.session.save((err) => {
+    if (err) return res.status(500).json({ error: 'Session error' });
+    res.json(req.session.user);
+  });
 });
 
 // Đăng xuất

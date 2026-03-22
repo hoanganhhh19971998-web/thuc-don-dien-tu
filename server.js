@@ -116,6 +116,15 @@ app.get('/admin', (req, res) => {
       console.log(`[OK] Da tao tai khoan admin mac dinh: admin / admin123 (don_vi_id=${defaultDv.id})`);
     }
 
+    // Auto-seed dữ liệu mẫu nếu database trống
+    try {
+      const { seedAll } = require('./seed_async');
+      const seeded = await seedAll();
+      if (seeded) console.log('[OK] Da seed du lieu mau thanh cong');
+    } catch (seedErr) {
+      console.log('[WARN] Seed loi (co the da co du lieu):', seedErr.message);
+    }
+
     // Start server
     app.listen(PORT, '0.0.0.0', () => {
       console.log('='.repeat(60));

@@ -7,15 +7,3 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
-      - key: SECRET_KEY
-        generateValue: true
-      - key: DATABASE_URL
-        fromDatabase:
-          name: thuc-don-db
-          property: connectionString
-
-databases:
-  - name: thuc-don-db
-    plan: free
-    databaseName: thuc_don_db
-    user: thuc_don_user

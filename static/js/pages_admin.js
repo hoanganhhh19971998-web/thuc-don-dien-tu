@@ -28,7 +28,10 @@ function updateUserUI() {
         </div>
         <div style="flex:1;min-width:0">
             <div style="font-size:0.8rem;font-weight:700;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${currentUser.ho_ten}</div>
-            <div style="font-size:0.65rem;color:var(--accent);text-transform:uppercase;letter-spacing:1px">${currentUser.vai_tro === 'admin' ? '🎖️ Quản trị viên' : '🪖 Chiến sĩ'}</div>
+            <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-size:0.65rem;color:var(--accent);text-transform:uppercase;letter-spacing:1px">${currentUser.vai_tro === 'admin' ? '🎖️ QTV' : '🪖 CS'}</span>
+                <span id="licenseBadge"></span>
+            </div>
         </div>
         <button onclick="doLogout()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:1rem;padding:4px" title="Đăng xuất">🚪</button>
     </div>`;

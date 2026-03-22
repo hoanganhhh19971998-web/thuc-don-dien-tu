@@ -78,6 +78,7 @@ async function loadAdminPage(tab) {
             case 'announce': await renderAdminAnnouncePage(c); break;
             case 'competition': await renderAdminCompPage(c); break;
             case 'waste': await renderAdminWastePage(c); break;
+            case 'license': await renderAdminLicensePage(c); break;
         }
     } catch(e) {
         c.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">${e.message}</div></div>`;
@@ -368,6 +369,119 @@ async function renderAdminWastePage(c) {
             showToast('Da nhap!', 'success'); loadAdminPage('waste');
         } catch(err) { showToast('Loi!', 'error'); }
     });
+}
+
+// === QUẢN LÝ LICENSE ===
+const GOI_LABELS = {
+  trial: { label: 'Dùng thử', gia: 'Miễn phí', badge: 'badge-info' },
+  '1thang': { label: '1 tháng', gia: '99.000đ', badge: 'badge-primary' },
+  '3thang': { label: '3 tháng', gia: '199.000đ', badge: 'badge-success' },
+  '6thang': { label: '6 tháng', gia: '299.000đ', badge: 'badge-warning' },
+  '1nam': { label: '1 năm', gia: '399.000đ', badge: 'badge-danger' },
+};
+const TRANG_THAI_LABELS = {
+  chua_dung: { label: 'Chưa dùng', badge: 'badge-info' },
+  dang_dung: { label: 'Đang dùng', badge: 'badge-success' },
+  het_han: { label: 'Hết hạn', badge: 'badge-warning' },
+};
+
+async function renderAdminLicensePage(c) {
+  const keys = await API.get('/api/admin/licenses');
+  const chuaDung = keys.filter(k => k.trang_thai === 'chua_dung').length;
+  const dangDung = keys.filter(k => k.trang_thai === 'dang_dung').length;
+  const hetHan = keys.filter(k => k.trang_thai === 'het_han').length;
+
+  c.innerHTML = `
+  <div class="page-header animate-in"><h2>🔑 Quản Lý License Key</h2><p>${keys.length} key (${chuaDung} chưa dùng, ${dangDung} đang dùng, ${hetHan} hết hạn)</p></div>
+  <div class="grid-2 mb-lg">
+    <div class="card animate-in">
+      <div class="card-title mb-md">➕ Tạo Key Mới</div>
+      <form id="licenseForm">
+        <div class="form-group"><label class="form-label">Gói dịch vụ *</label>
+          <select class="form-select" name="goi" required>
+            <option value="1thang">💳 1 tháng — 99.000đ</option>
+            <option value="3thang">💎 3 tháng — 199.000đ</option>
+            <option value="6thang">🏆 6 tháng — 299.000đ</option>
+            <option value="1nam">👑 1 năm — 399.000đ</option>
+            <option value="trial">🎁 Dùng thử — Miễn phí</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Số lượng key</label>
+          <input class="form-input" type="number" name="so_luong" value="1" min="1" max="50">
+        </div>
+        <div class="form-group"><label class="form-label">Ghi chú</label>
+          <input class="form-input" type="text" name="ghi_chu" placeholder="Tên khách hàng, đơn hàng...">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%">🔑 Tạo Key</button>
+      </form>
+    </div>
+    <div class="card animate-in">
+      <div class="card-title mb-md">📊 Bảng Giá</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        ${Object.entries(GOI_LABELS).map(([k, v]) => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--bg-secondary);border-radius:8px">
+          <span><span class="badge ${v.badge}">${v.label}</span></span>
+          <span style="font-weight:700;color:var(--accent)">${v.gia}</span>
+        </div>`).join('')}
+      </div>
+      <div style="margin-top:16px;padding:12px;background:rgba(59,130,246,0.1);border-radius:8px;font-size:0.8rem;color:var(--text-secondary)">
+        📌 Khách mua tại <a href="https://app-store-pearl.vercel.app" target="_blank" style="color:var(--accent)">app-store-pearl.vercel.app</a> → Admin tạo key → Gửi key cho khách qua Zalo/SMS
+      </div>
+    </div>
+  </div>
+  <div class="card animate-in">
+    <div class="card-title mb-md">📋 Danh Sách Key (${keys.length})</div>
+    <div class="table-container"><table><thead><tr>
+      <th>Mã Key</th><th>Gói</th><th>Trạng thái</th><th>Người dùng</th><th>Ngày tạo</th><th>Hết hạn</th><th>Thao tác</th>
+    </tr></thead><tbody>
+    ${keys.map(k => {
+      const goiInfo = GOI_LABELS[k.goi] || { label: k.goi, badge: 'badge-info' };
+      const ttInfo = TRANG_THAI_LABELS[k.trang_thai] || { label: k.trang_thai, badge: 'badge-info' };
+      return `<tr>
+        <td><code style="background:var(--bg-secondary);padding:3px 8px;border-radius:6px;font-size:0.8rem;letter-spacing:1px">${k.key_code}</code></td>
+        <td><span class="badge ${goiInfo.badge}">${goiInfo.label}</span></td>
+        <td><span class="badge ${ttInfo.badge}">${ttInfo.label}</span></td>
+        <td>${k.ho_ten ? `<strong>${k.ho_ten}</strong><div style="font-size:0.7rem;color:var(--text-muted)">${k.ten_dang_nhap}</div>` : '<span style="color:var(--text-muted)">—</span>'}</td>
+        <td style="font-size:0.75rem">${formatDateTime(k.ngay_tao)}</td>
+        <td style="font-size:0.75rem">${k.ngay_het_han ? formatDateTime(k.ngay_het_han) : '—'}</td>
+        <td style="white-space:nowrap">
+          <button class="btn btn-outline btn-sm" onclick="copyKey('${k.key_code}')" title="Copy">📋</button>
+          ${k.trang_thai === 'chua_dung' ? `<button class="btn btn-danger btn-sm" onclick="deleteLicenseKey(${k.id})">🗑️</button>` : ''}
+        </td>
+      </tr>`;
+    }).join('')}
+    </tbody></table></div>
+  </div>`;
+
+  document.getElementById('licenseForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const fd = new FormData(this);
+    try {
+      const keys = await API.post('/api/admin/licenses', {
+        goi: fd.get('goi'), so_luong: parseInt(fd.get('so_luong')), ghi_chu: fd.get('ghi_chu')
+      });
+      const keyStr = keys.map(k => k.key_code).join('\n');
+      showToast(`Đã tạo ${keys.length} key!`, 'success');
+      // Show keys in modal for easy copy
+      openModal('🔑 Key Đã Tạo', `
+        <div style="background:var(--bg-secondary);padding:16px;border-radius:12px;margin-bottom:16px">
+          ${keys.map(k => `<div style="font-family:monospace;font-size:1rem;padding:8px 0;letter-spacing:2px;color:var(--accent)">${k.key_code}</div>`).join('')}
+        </div>
+        <button class="btn btn-primary" style="width:100%" onclick="navigator.clipboard.writeText('${keyStr}');showToast('Đã copy!','success')">📋 Copy Tất Cả</button>
+      `);
+      loadAdminPage('license');
+    } catch(err) { showToast('Lỗi: ' + err.message, 'error'); }
+  });
+}
+
+function copyKey(code) {
+  navigator.clipboard.writeText(code).then(() => showToast('Đã copy: ' + code, 'success'));
+}
+
+async function deleteLicenseKey(id) {
+  if (!confirm('Xóa key này?')) return;
+  try { await API.delete(`/api/admin/licenses/${id}`); showToast('Đã xóa!', 'success'); loadAdminPage('license'); }
+  catch(e) { showToast('Lỗi!', 'error'); }
 }
 
 // === INIT ===

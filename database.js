@@ -264,6 +264,19 @@ const CREATE_TABLES_PG = `
     nam INTEGER NOT NULL,
     mo_ta TEXT
   );
+
+  CREATE TABLE IF NOT EXISTS license_keys (
+    id SERIAL PRIMARY KEY,
+    key_code TEXT UNIQUE NOT NULL,
+    goi TEXT NOT NULL DEFAULT 'trial',
+    thoi_han_ngay INTEGER NOT NULL DEFAULT 30,
+    nguoi_dung_id INTEGER REFERENCES nguoi_dung(id),
+    trang_thai TEXT DEFAULT 'chua_dung',
+    ngay_tao TIMESTAMP DEFAULT NOW(),
+    ngay_kich_hoat TIMESTAMP,
+    ngay_het_han TIMESTAMP,
+    ghi_chu TEXT
+  );
 `;
 
 const CREATE_TABLES_SQLITE = `
@@ -341,6 +354,18 @@ const CREATE_TABLES_SQLITE = `
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     mon_an_id INTEGER NOT NULL REFERENCES mon_an(id), don_vi_id INTEGER REFERENCES don_vi(id),
     thang INTEGER NOT NULL, nam INTEGER NOT NULL, mo_ta TEXT
+  );
+  CREATE TABLE IF NOT EXISTS license_keys (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    key_code TEXT UNIQUE NOT NULL,
+    goi TEXT NOT NULL DEFAULT 'trial',
+    thoi_han_ngay INTEGER NOT NULL DEFAULT 30,
+    nguoi_dung_id INTEGER REFERENCES nguoi_dung(id),
+    trang_thai TEXT DEFAULT 'chua_dung',
+    ngay_tao TEXT DEFAULT (datetime('now')),
+    ngay_kich_hoat TEXT,
+    ngay_het_han TEXT,
+    ghi_chu TEXT
   );
 `;
 

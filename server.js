@@ -81,6 +81,7 @@ app.use(require('./routes/competitionRoutes'));
 app.use(require('./routes/votingRoutes'));
 app.use(require('./routes/personnelRoutes'));
 app.use(require('./routes/adminRoutes'));
+app.use(require('./routes/licenseRoutes'));
 
 // Serve frontend SPA
 app.get('/', (req, res) => {

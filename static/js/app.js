@@ -178,6 +178,9 @@ function enterApp(user) {
     updateUserUI();
     navigateTo('home');
 
+    // Check license status
+    checkLicenseStatus(user);
+
     // Load feedback badge
     API.get('/api/feedback').then(data => {
         const unread = data.filter(f => !f.da_doc).length;
@@ -187,6 +190,89 @@ function enterApp(user) {
             badge.style.display = 'inline';
         }
     }).catch(() => {});
+}
+
+async function checkLicenseStatus(user) {
+    // Admin bypasses license
+    if (user && user.vai_tro === 'admin') {
+        updateLicenseBadge({ active: true, goi: 'admin', goi_label: 'Quản trị viên', con_lai_ngay: 9999 });
+        return;
+    }
+    try {
+        const license = user?.license || await API.get('/api/license/status');
+        updateLicenseBadge(license);
+        if (!license.active) {
+            showLicensePopup();
+        } else if (license.canh_bao) {
+            showToast(`⚠️ License còn ${license.con_lai_ngay} ngày - Hãy gia hạn!`, 'warning');
+        }
+    } catch(e) {}
+}
+
+function updateLicenseBadge(license) {
+    const el = document.getElementById('licenseBadge');
+    if (!el) return;
+    if (!license || !license.active) {
+        el.innerHTML = '<span style="color:#ef4444;font-size:0.7rem">❌ Hết hạn</span>';
+        el.style.cursor = 'pointer';
+        el.onclick = showLicensePopup;
+    } else if (license.goi === 'admin') {
+        el.innerHTML = '<span style="color:#10b981;font-size:0.7rem">🌟 Admin</span>';
+    } else {
+        const color = license.canh_bao ? '#f59e0b' : '#10b981';
+        el.innerHTML = `<span style="color:${color};font-size:0.7rem">🔑 ${license.con_lai_ngay} ngày</span>`;
+    }
+}
+
+function showLicensePopup() {
+    // Create overlay
+    let overlay = document.getElementById('licenseOverlay');
+    if (overlay) overlay.remove();
+    overlay = document.createElement('div');
+    overlay.id = 'licenseOverlay';
+    overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn 0.3s';
+    overlay.innerHTML = `
+    <div style="background:var(--bg-card,#0f172a);border:1px solid rgba(255,255,255,0.1);border-radius:20px;max-width:420px;width:100%;padding:32px;text-align:center;animation:slideUp 0.4s">
+        <div style="font-size:3rem;margin-bottom:12px">🔒</div>
+        <h2 style="color:#f1f5f9;margin:0 0 8px;font-size:1.3rem">License Hết Hạn</h2>
+        <p style="color:#94a3b8;font-size:0.85rem;margin:0 0 20px">Vui lòng nhập mã key để tiếp tục sử dụng, hoặc mua key mới.</p>
+        <div style="margin-bottom:16px">
+            <input type="text" id="licenseKeyInput" placeholder="Nhập mã key: HA-XXXX-XXXX-XXXX" 
+                style="width:100%;padding:14px 16px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:12px;color:#f1f5f9;font-size:0.95rem;text-align:center;letter-spacing:2px;font-family:monospace;box-sizing:border-box"
+            >
+            <div id="licenseKeyError" style="color:#ef4444;font-size:0.8rem;margin-top:6px;display:none"></div>
+        </div>
+        <button onclick="activateLicenseKey()" style="width:100%;padding:14px;background:linear-gradient(135deg,#3b82f6,#6366f1);border:none;border-radius:12px;color:white;font-size:0.95rem;font-weight:700;cursor:pointer;margin-bottom:10px">🔑 Kích Hoạt Key</button>
+        <a href="https://app-store-pearl.vercel.app" target="_blank" style="display:block;width:100%;padding:14px;background:linear-gradient(135deg,#10b981,#059669);border:none;border-radius:12px;color:white;font-size:0.95rem;font-weight:700;text-decoration:none;cursor:pointer;box-sizing:border-box;margin-bottom:16px">🛒 Mua Key Tại Đây</a>
+        <div style="display:flex;flex-direction:column;gap:6px;text-align:left;padding:12px;background:rgba(255,255,255,0.04);border-radius:10px;margin-bottom:16px">
+            <div style="font-size:0.75rem;color:#94a3b8;font-weight:600;margin-bottom:4px">💰 Bảng Giá</div>
+            <div style="display:flex;justify-content:space-between;font-size:0.8rem"><span style="color:#94a3b8">1 tháng</span><span style="color:#60a5fa;font-weight:700">99.000đ</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:0.8rem"><span style="color:#94a3b8">3 tháng</span><span style="color:#10b981;font-weight:700">199.000đ</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:0.8rem"><span style="color:#94a3b8">6 tháng</span><span style="color:#f59e0b;font-weight:700">299.000đ</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:0.8rem"><span style="color:#94a3b8">1 năm</span><span style="color:#ef4444;font-weight:700">399.000đ</span></div>
+        </div>
+        <div style="font-size:0.7rem;color:#64748b">Liên hệ Zalo: 0336 309 979 để được hỗ trợ</div>
+    </div>`;
+    document.body.appendChild(overlay);
+    setTimeout(() => document.getElementById('licenseKeyInput')?.focus(), 300);
+}
+
+async function activateLicenseKey() {
+    const input = document.getElementById('licenseKeyInput');
+    const errEl = document.getElementById('licenseKeyError');
+    const keyCode = (input?.value || '').trim();
+    if (!keyCode) { errEl.textContent = 'Vui lòng nhập mã key'; errEl.style.display = 'block'; return; }
+    try {
+        const result = await API.post('/api/license/activate', { key_code: keyCode });
+        // Remove overlay
+        const overlay = document.getElementById('licenseOverlay');
+        if (overlay) overlay.remove();
+        showToast(`✅ Kích hoạt thành công! Gói: ${result.goi_label}, còn ${result.con_lai_ngay} ngày`, 'success');
+        updateLicenseBadge({ active: true, goi: result.goi, goi_label: result.goi_label, con_lai_ngay: result.con_lai_ngay });
+    } catch(e) {
+        errEl.textContent = e.message || 'Mã key không hợp lệ hoặc đã sử dụng';
+        errEl.style.display = 'block';
+    }
 }
 
 // Init

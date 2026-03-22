@@ -187,16 +187,20 @@ async function renderFeedback() {
             </div>
 
             <div id="feedbackTabList" style="display:none">
+                ${unread > 0 ? `<div style="margin-bottom:12px;text-align:right"><button class="btn btn-primary btn-sm" onclick="markAllFeedbackRead()">✅ Đánh dấu tất cả đã đọc (${unread})</button></div>` : ''}
                 <div class="feedback-list stagger-in">
                     ${feedbacks.length === 0 ? '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">Chưa có góp ý nào</div></div>' :
                     feedbacks.map(f => `
-                    <div class="feedback-item">
+                    <div class="feedback-item" id="fb-${f.id}" style="${!f.da_doc ? 'border-left:3px solid var(--warning);' : ''}">
                         <div class="feedback-header">
                             <div class="feedback-author">
                                 ${f.an_danh ? '🎭 Ẩn danh' : `👤 ${f.chien_si_ten}`}
                                 ${!f.da_doc ? '<span class="badge badge-warning">Chưa đọc</span>' : '<span class="badge badge-success">Đã đọc</span>'}
                             </div>
-                            <div class="feedback-date">${formatDateTime(f.ngay_tao)}</div>
+                            <div style="display:flex;align-items:center;gap:6px">
+                                <span class="feedback-date">${formatDateTime(f.ngay_tao)}</span>
+                                ${!f.da_doc ? `<button class="btn btn-outline btn-sm" onclick="markFeedbackRead(${f.id})" title="Đánh dấu đã đọc">✅</button>` : ''}
+                            </div>
                         </div>
                         <div class="feedback-body">${f.noi_dung}</div>
                         ${f.hinh_anh ? `<img src="${f.hinh_anh}" class="feedback-image" style="max-width:300px; margin-top:8px; border-radius:8px; cursor:pointer" onclick="window.open('${f.hinh_anh}')">` : ''}
@@ -252,4 +256,29 @@ function switchFeedbackTab(tab, el) {
         const el2 = document.getElementById(`feedbackTab${t.charAt(0).toUpperCase() + t.slice(1)}`);
         if (el2) el2.style.display = t === tab ? 'block' : 'none';
     });
+}
+
+async function markFeedbackRead(id) {
+    try {
+        await API.post(`/api/feedback/${id}/read`, {});
+        showToast('Đã đánh dấu đã đọc ✅', 'success');
+        renderFeedback();
+        // After re-render, switch to list tab
+        setTimeout(() => {
+            const listTab = document.querySelector('#feedbackTabs .tab:nth-child(2)');
+            if (listTab) switchFeedbackTab('list', listTab);
+        }, 100);
+    } catch(e) { showToast('Lỗi!', 'error'); }
+}
+
+async function markAllFeedbackRead() {
+    try {
+        await API.post('/api/feedback/read-all', {});
+        showToast('Đã đánh dấu tất cả đã đọc ✅', 'success');
+        renderFeedback();
+        setTimeout(() => {
+            const listTab = document.querySelector('#feedbackTabs .tab:nth-child(2)');
+            if (listTab) switchFeedbackTab('list', listTab);
+        }, 100);
+    } catch(e) { showToast('Lỗi!', 'error'); }
 }

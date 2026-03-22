@@ -103,4 +103,24 @@ router.post('/api/feedback/:feedbackId/reply', loginRequired, async (req, res) =
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+// Đánh dấu đã đọc từng góp ý
+router.post('/api/feedback/:feedbackId/read', loginRequired, async (req, res) => {
+  try {
+    const gy = await db.get('SELECT * FROM gop_y WHERE id = ?', req.params.feedbackId);
+    if (!gy) return res.status(404).json({ error: 'Not found' });
+    await db.run('UPDATE gop_y SET da_doc = 1 WHERE id = ?', gy.id);
+    const updated = await db.get('SELECT * FROM gop_y WHERE id = ?', gy.id);
+    res.json(await gopYToDict(updated));
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// Đánh dấu tất cả đã đọc
+router.post('/api/feedback/read-all', loginRequired, async (req, res) => {
+  try {
+    const dvid = getUserDonViId(req);
+    await db.run('UPDATE gop_y SET da_doc = 1 WHERE don_vi_id = ? AND da_doc = 0', dvid);
+    res.json({ message: 'Đã đánh dấu tất cả đã đọc' });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 module.exports = router;

@@ -1484,6 +1484,9 @@ tr:hover td {
     z-index: 399;
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
 /* === RESPONSIVE === */
@@ -1516,6 +1519,8 @@ tr:hover td {
     
     .mobile-overlay.active {
         display: block;
+        pointer-events: auto;
+        opacity: 1;
     }
     
     .main-content {

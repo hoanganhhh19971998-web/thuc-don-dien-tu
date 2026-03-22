@@ -110,6 +110,8 @@ function dishEmoji(loai) {
 }
 
 // === SIDEBAR MOBILE ===
+let _sidebarTouched = false;
+
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('mobileOverlay');
@@ -118,15 +120,34 @@ function toggleSidebar() {
     document.body.classList.toggle('sidebar-open', isOpen);
 }
 
-// Close sidebar on overlay touch (important for mobile)
+function closeSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('mobileOverlay');
+    sidebar.classList.remove('open');
+    overlay.classList.remove('active');
+    document.body.classList.remove('sidebar-open');
+}
+
+// Close sidebar on overlay touch/click (important for mobile)
 document.addEventListener('DOMContentLoaded', () => {
     const overlay = document.getElementById('mobileOverlay');
     if (overlay) {
-        // Use touchstart for faster response on mobile
-        overlay.addEventListener('touchstart', (e) => {
+        // Use touchend for reliable mobile response
+        overlay.addEventListener('touchend', (e) => {
             e.preventDefault();
-            toggleSidebar();
+            e.stopPropagation();
+            _sidebarTouched = true;
+            closeSidebar();
+            // Reset flag after a short delay
+            setTimeout(() => { _sidebarTouched = false; }, 400);
         }, { passive: false });
+
+        // Fallback for click (desktop or when touch doesn't fire)
+        overlay.addEventListener('click', (e) => {
+            if (_sidebarTouched) return; // Already handled by touch
+            e.stopPropagation();
+            closeSidebar();
+        });
     }
 });
 
